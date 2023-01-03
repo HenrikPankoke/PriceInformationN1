@@ -1,0 +1,85 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using System.Threading.Tasks
+@using PriceInfo.Services
+@using System.Text;
+@using PriceInfo.Classes
+@using Syncfusion.Blazor.Charts
+
+@inject HttpClient Http
+@page "/"
+
+<h1>Spot Price DK1</h1>
+
+@using Syncfusion.Blazor.Charts
+
+<SfChart Title="">
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+    </ChartPrimaryXAxis>
+
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@data.records" XName="HourDK" YName="SpotPriceDKK" Opacity="0.5" DashArray="10" Fill="blue" Type="ChartSeriesType.Bar">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
+
+@*<SfGrid DataSource="@data.records">
+        <GridColumns>
+            <GridColumn Field=@nameof(Record.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>
+            <GridColumn Field=@nameof(Record.SpotPriceDKK) HeaderText="SpotPrice DKK" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+
+        </GridColumns>
+    </SfGrid>*@
+
+@code{
+    private SpotPrice data = new();
+    private string status = "Succes";
+
+    public List<Record> prices { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        string today = DateTime.Today.ToString("yyyy-MM-dd");
+        string tomorrow = DateTime.Today.AddDays(2).ToString("yyyy-MM-dd");
+        StringBuilder sb = new StringBuilder();
+        sb.Append("https://api.energidataservice.dk/dataset/Elspotprices?start=");
+        sb.Append(today);
+        sb.Append("&end=");
+        sb.Append(tomorrow);
+        sb.Append("&filter={%22PriceArea%22:[%22DK1%22]}");
+        var endpoint = new Uri(sb.ToString());
+
+        // parses JSON response.
+        data = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+}
+
+@*<SfGrid DataSource="@data.records" />
+
+
+
+    @code {
+
+
+        protected override async Task OnInitializedAsync()
+        {
+
+
+
+        }
+    }*@
+
