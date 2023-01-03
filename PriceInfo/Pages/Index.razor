@@ -5,42 +5,55 @@
 @using System.Text;
 @using PriceInfo.Classes
 @using Syncfusion.Blazor.Charts
-
 @inject HttpClient Http
 @page "/"
 
 <h1>Spot Price DK1</h1>
 
-@using Syncfusion.Blazor.Charts
+
+
+
+<SfGrid DataSource="@prices.calculatedPrices">
+    <GridColumns>
+        <GridColumn Field=@nameof(ActualPrice.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>-->
+        <GridColumn Field=@nameof(ActualPrice.SpotPriceDKK) HeaderText="SpotPrice" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+        <GridColumn Field=@nameof(ActualPrice.Tarif) HeaderText="Tarif" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+        <GridColumn Field=@nameof(ActualPrice.Total) HeaderText="inkl. moms" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+
+    </GridColumns>
+</SfGrid>
 
 <SfChart Title="">
     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
     </ChartPrimaryXAxis>
 
     <ChartSeriesCollection>
-        <ChartSeries DataSource="@data.records" XName="HourDK" YName="SpotPriceDKK" Opacity="0.5" DashArray="10" Fill="blue" Type="ChartSeriesType.Bar">
+        <ChartSeries DataSource="@prices.calculatedPrices" XName="HourDK" YName="Total" Opacity="0.5" DashArray="10" Fill="blue" Type="ChartSeriesType.Bar">
         </ChartSeries>
     </ChartSeriesCollection>
 </SfChart>
 
 
-@*<SfGrid DataSource="@data.records">
-        <GridColumns>
-            <GridColumn Field=@nameof(Record.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>
-            <GridColumn Field=@nameof(Record.SpotPriceDKK) HeaderText="SpotPrice DKK" TextAlign="TextAlign.Left" Width="150"></GridColumn>
-
-        </GridColumns>
-    </SfGrid>*@
 
 @code{
-    private SpotPrice data = new();
-    private string status = "Succes";
-
-    public List<Record> prices { get; set; }
+    Prices prices = new Prices();
 
     protected override async Task OnInitializedAsync()
     {
 
+        ListofTarifs(prices);
+        await GetSpotPrice(prices);
+        await MatchSpotWithTarif(prices);
+        await PrepareListData();
+
+    }
+
+    private async Task GetSpotPrice(Prices prices)
+    {
+        prices.spotPrice = new();
+
+
+        //https://api.energidataservice.dk/dataset/Elspotprices?start=2022-12-31&end=2023-01-01&filter={%22PriceArea%22:[%22DK1%22]}
         string today = DateTime.Today.ToString("yyyy-MM-dd");
         string tomorrow = DateTime.Today.AddDays(2).ToString("yyyy-MM-dd");
         StringBuilder sb = new StringBuilder();
@@ -50,36 +63,56 @@
         sb.Append(tomorrow);
         sb.Append("&filter={%22PriceArea%22:[%22DK1%22]}");
         var endpoint = new Uri(sb.ToString());
-
-        // parses JSON response.
-        data = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
-
-
-
-
-
-
-
-
-
+        prices.spotPrice = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
 
     }
 
+    private async Task PrepareListData()
+    {
+        foreach (var p in prices.calculatedPrices)
+        {
+
+            p.Total = Math.Round((((p.SpotPriceDKK / 10) + p.Tarif) * 1.25), 2);
+            p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
+        }
+    }
+
+    private async Task MatchSpotWithTarif(Prices prices)
+    {
+        prices.calculatedPrices = new();
+        foreach (var r in prices.spotPrice.records)
+        {
+            ActualPrice ap = new(r.HourDK, r.SpotPriceDKK, AddTarif(r.HourDK.Hour, prices.tarifs));
+            prices.calculatedPrices.Add(ap);
+            //Console.WriteLine(r.HourDK.Hour);
+        }
+    }
+
+    private static double AddTarif(int hour, List<TarifWindow> tarifs)
+    {
+        double output = 0.0;
+        foreach (var t in tarifs)
+        {
+            if (hour >= t.StartHourDK && hour < t.EndHourDK)
+            {
+                output = t.TarifDKK;
+            }
+        }
+        return output;
+    }
+
+    private static void ListofTarifs(Prices prices)
+    {
+        prices.tarifs = new List<TarifWindow>();
+
+        //https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2023
+        prices.tarifs.Add(new(0, 17, "N1", 43.22));
+        prices.tarifs.Add(new(17, 21, "N1", 105.62));
+        prices.tarifs.Add(new(21, 24, "N1", 43.22));
+
+    }
 
 }
 
-@*<SfGrid DataSource="@data.records" />
 
-
-
-    @code {
-
-
-        protected override async Task OnInitializedAsync()
-        {
-
-
-
-        }
-    }*@
 
