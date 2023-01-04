@@ -23,7 +23,7 @@
     </ChartPrimaryXAxis>
 
     <ChartSeriesCollection>
-        <ChartSeries DataSource="@data" XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar" >
+        <ChartSeries DataSource="@graphData" PointColorMapping="color"  XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar" >
             <ChartMarker>
                 <ChartDataLabel Visible="true" Name="marking" />
                 
@@ -36,14 +36,14 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
 
 @code{
     Prices prices = new Prices();
-    List<ActualPrice> data;
+    List<ActualPrice> graphData;
     protected override async Task OnInitializedAsync()
     {
 
         ListofTarifs(prices);
         await GetSpotPrice(prices);
         await MatchSpotWithTarif(prices);
-        await PrepareListData();
+        await PrepareGraphData();
 
     }
 
@@ -66,7 +66,7 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
 
     }
 
-    private async Task PrepareListData()
+    private async Task PrepareGraphData()
     {
         foreach (var p in prices.calculatedPrices)
         {
@@ -74,9 +74,18 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
             p.Total = Math.Round(((p.SpotPriceDKK / 10) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
             p.marking = $"{p.Total} øre";
-            p.color = "green";
+            p.color = "orange";
+            if (p.Total <=100)
+            {
+                p.color = "green";
+            }
+            if (p.Total >= 200)
+            {
+                p.color = "red";
+            }
+            
         }
-        data = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
+        graphData = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
 
     }
 
