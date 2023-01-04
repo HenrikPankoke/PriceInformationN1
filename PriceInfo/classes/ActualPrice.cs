@@ -16,8 +16,10 @@
         public double SpotPriceDKK { get; set; }
         //public double SpotPriceDKK { get { return SpotPriceDKK / 10; } set { } }
         public double Tarif { get; set; }
-        //public double Total { get; set; }
-        public double Total { get { return (SpotPriceDKK+Tarif)*1.25; } set { } }
+        public double Total { get; set; }
+        //public double Total { get { return (SpotPriceDKK+Tarif)*1.25; } set { } }
+        public string marking { get; set; }
+        public string color { get; set; }
     }
     
 

@@ -8,31 +8,30 @@
 @inject HttpClient Http
 @page "/"
 
-<h1>Spot Price DK1</h1>
-
-
-
-
+@*<h1>Spot Price DK1</h1>
 <SfGrid DataSource="@prices.calculatedPrices">
     <GridColumns>
-        <GridColumn Field=@nameof(ActualPrice.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>-->
+        <GridColumn Field=@nameof(ActualPrice.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>
         <GridColumn Field=@nameof(ActualPrice.SpotPriceDKK) HeaderText="SpotPrice" TextAlign="TextAlign.Left" Width="150"></GridColumn>
         <GridColumn Field=@nameof(ActualPrice.Tarif) HeaderText="Tarif" TextAlign="TextAlign.Left" Width="150"></GridColumn>
         <GridColumn Field=@nameof(ActualPrice.Total) HeaderText="inkl. moms" TextAlign="TextAlign.Left" Width="150"></GridColumn>
-
     </GridColumns>
-</SfGrid>
+</SfGrid>*@
 
-<SfChart Title="">
-    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+<SfChart Title="Pris DK1 - N1 [øre/kwh]" Width="800px" Height="480px">
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" >
     </ChartPrimaryXAxis>
 
     <ChartSeriesCollection>
-        <ChartSeries DataSource="@prices.calculatedPrices" XName="HourDK" YName="Total" Opacity="0.5" DashArray="10" Fill="blue" Type="ChartSeriesType.Bar">
+        <ChartSeries DataSource="@prices.calculatedPrices" XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar" >
+            <ChartMarker>
+                <ChartDataLabel Visible="true" Name="marking" />
+                
+            </ChartMarker>
         </ChartSeries>
     </ChartSeriesCollection>
 </SfChart>
-
+Priser indholder spotpris DK1 + Net Tarif N1 + moms
 
 
 @code{
@@ -72,8 +71,10 @@
         foreach (var p in prices.calculatedPrices)
         {
 
-            p.Total = Math.Round((((p.SpotPriceDKK / 10) + p.Tarif) * 1.25), 2);
+            p.Total = Math.Round(((p.SpotPriceDKK / 10) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
+            p.marking = $"{p.Total} øre";
+            p.color = "green";
         }
     }
 
