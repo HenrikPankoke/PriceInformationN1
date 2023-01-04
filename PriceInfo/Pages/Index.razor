@@ -18,12 +18,12 @@
     </GridColumns>
 </SfGrid>*@
 
-<SfChart Title="Pris DK1 - N1 [øre/kwh]" Width="800px" Height="480px">
+<SfChart Title="Pris DK1 - N1 [øre/kwh]" Width="800px" Height="800px">
     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" >
     </ChartPrimaryXAxis>
 
     <ChartSeriesCollection>
-        <ChartSeries DataSource="@prices.calculatedPrices" XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar" >
+        <ChartSeries DataSource="@data" XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar" >
             <ChartMarker>
                 <ChartDataLabel Visible="true" Name="marking" />
                 
@@ -36,7 +36,7 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
 
 @code{
     Prices prices = new Prices();
-
+    List<ActualPrice> data;
     protected override async Task OnInitializedAsync()
     {
 
@@ -76,6 +76,8 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
             p.marking = $"{p.Total} øre";
             p.color = "green";
         }
+        data = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
+
     }
 
     private async Task MatchSpotWithTarif(Prices prices)
