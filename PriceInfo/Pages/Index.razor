@@ -7,42 +7,63 @@
 @using Syncfusion.Blazor.Charts
 @inject HttpClient Http
 @page "/"
+@page "/{priceArea}"
 
 @*<h1>Spot Price DK1</h1>
-<SfGrid DataSource="@prices.calculatedPrices">
-    <GridColumns>
-        <GridColumn Field=@nameof(ActualPrice.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>
-        <GridColumn Field=@nameof(ActualPrice.SpotPriceDKK) HeaderText="SpotPrice" TextAlign="TextAlign.Left" Width="150"></GridColumn>
-        <GridColumn Field=@nameof(ActualPrice.Tarif) HeaderText="Tarif" TextAlign="TextAlign.Left" Width="150"></GridColumn>
-        <GridColumn Field=@nameof(ActualPrice.Total) HeaderText="inkl. moms" TextAlign="TextAlign.Left" Width="150"></GridColumn>
-    </GridColumns>
-</SfGrid>*@
+    <SfGrid DataSource="@prices.calculatedPrices">
+        <GridColumns>
+            <GridColumn Field=@nameof(ActualPrice.HourDK) HeaderText="Hour DK" TextAlign="TextAlign.Left" Width="200"></GridColumn>
+            <GridColumn Field=@nameof(ActualPrice.SpotPriceDKK) HeaderText="SpotPrice" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+            <GridColumn Field=@nameof(ActualPrice.Tarif) HeaderText="Tarif" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+            <GridColumn Field=@nameof(ActualPrice.Total) HeaderText="inkl. moms" TextAlign="TextAlign.Left" Width="150"></GridColumn>
+        </GridColumns>
+    </SfGrid>*@
 
-<SfChart Title="Pris DK1 - N1 [øre/kwh]" Width="800px" Height="800px">
-    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" >
+<SfChart Title= "@chartTitle" Width="800px" Height="800px">
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
     </ChartPrimaryXAxis>
 
     <ChartSeriesCollection>
-        <ChartSeries DataSource="@graphData" PointColorMapping="color"  XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar" >
+        <ChartSeries DataSource="@graphData" PointColorMapping="color" XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar">
             <ChartMarker>
                 <ChartDataLabel Visible="true" Name="marking" />
-                
+
             </ChartMarker>
         </ChartSeries>
     </ChartSeriesCollection>
 </SfChart>
-Priser indholder spotpris DK1 + Net Tarif N1 + moms
+@subTitle<br />
+Maks: @Math.Round(max,1) øre<br />
+Gennemsnit: @Math.Round(avg,1) øre<br />
 
 
 @code{
+    [Parameter]
+    public string priceArea { get; set; }
+    public string chartTitle { get; set; }
+    public string subTitle { get; set; }
+
+    protected override void OnInitialized()
+    {
+        priceArea = priceArea ?? "N1";
+    }
+    double max = 0.0;
+    double avg = 0.0;
+
+
+
+
+
     Prices prices = new Prices();
     List<ActualPrice> graphData;
     protected override async Task OnInitializedAsync()
     {
+        chartTitle = $"DK1 - {priceArea} [øre/kWh]";
+        subTitle = $"Priser indholder spotpris DK1 + Net Tarif {priceArea} + moms";
 
         ListofTarifs(prices);
         await GetSpotPrice(prices);
-        await MatchSpotWithTarif(prices);
+        await MatchSpotWithTarif(prices,priceArea);
         await PrepareGraphData();
 
     }
@@ -68,42 +89,57 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
 
     private async Task PrepareGraphData()
     {
+        double sum = 0.0;
+
+
         foreach (var p in prices.calculatedPrices)
         {
 
             p.Total = Math.Round(((p.SpotPriceDKK / 10) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
             p.marking = $"{p.Total} øre";
+            sum = sum + p.Total;
+            if (p.Total >= max)
+            {
+                max = p.Total;
+            }
+        }
+        avg = sum / prices.calculatedPrices.Count;
+
+        foreach (var p in prices.calculatedPrices)
+        {
             p.color = "orange";
-            if (p.Total <=100)
+            if (p.Total <= avg)
             {
                 p.color = "green";
             }
-            if (p.Total >= 200)
+            if (p.Total > max * 0.75)
             {
                 p.color = "red";
             }
-            
         }
+
+
         graphData = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
 
     }
 
-    private async Task MatchSpotWithTarif(Prices prices)
+
+    private async Task MatchSpotWithTarif(Prices prices, string priceArea)
     {
         prices.calculatedPrices = new();
         foreach (var r in prices.spotPrice.records)
         {
-            ActualPrice ap = new(r.HourDK, r.SpotPriceDKK, AddTarif(r.HourDK.Hour, prices.tarifs));
+            ActualPrice ap = new(r.HourDK, r.SpotPriceDKK, AddTarif(r.HourDK.Hour, prices.tarifs, priceArea));
             prices.calculatedPrices.Add(ap);
             //Console.WriteLine(r.HourDK.Hour);
         }
     }
 
-    private static double AddTarif(int hour, List<TarifWindow> tarifs)
+    private static double AddTarif(int hour, List<TarifWindow> tarifs, string priceArea)
     {
         double output = 0.0;
-        foreach (var t in tarifs)
+        foreach (var t in tarifs.Where(x => x.PriceArea == priceArea))
         {
             if (hour >= t.StartHourDK && hour < t.EndHourDK)
             {
@@ -121,6 +157,10 @@ Priser indholder spotpris DK1 + Net Tarif N1 + moms
         prices.tarifs.Add(new(0, 17, "N1", 43.22));
         prices.tarifs.Add(new(17, 21, "N1", 105.62));
         prices.tarifs.Add(new(21, 24, "N1", 43.22));
+
+        prices.tarifs.Add(new(0, 17, "DinEl", 16.36));
+        prices.tarifs.Add(new(17, 21, "DinEl", 45.37));
+        prices.tarifs.Add(new(21, 24, "DinEl", 16.36));
 
     }
 
