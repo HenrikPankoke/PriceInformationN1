@@ -8,7 +8,7 @@
 @inject HttpClient Http
 @page "/"
 @page "/{priceArea}"
-
+@page "/index/{priceArea}"
 @*<h1>Spot Price DK1</h1>
     <SfGrid DataSource="@prices.calculatedPrices">
         <GridColumns>
@@ -19,7 +19,7 @@
         </GridColumns>
     </SfGrid>*@
 
-<SfChart Title= "@chartTitle" Width="800px" Height="800px">
+<SfChart Title="@chartTitle" Width="800px" Height="800px">
     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
     </ChartPrimaryXAxis>
 
@@ -32,9 +32,12 @@
         </ChartSeries>
     </ChartSeriesCollection>
 </SfChart>
-@subTitle<br />
-Maks: @Math.Round(max,1) øre<br />
-Gennemsnit: @Math.Round(avg,1) øre<br />
+@subTitle
+<br />
+Maks: @Math.Round(max, 1) øre
+<br />
+Gennemsnit: @Math.Round(avg, 1) øre
+<br />
 
 
 @code{
@@ -63,7 +66,7 @@ Gennemsnit: @Math.Round(avg,1) øre<br />
 
         ListofTarifs(prices);
         await GetSpotPrice(prices);
-        await MatchSpotWithTarif(prices,priceArea);
+        await MatchSpotWithTarif(prices, priceArea);
         await PrepareGraphData();
 
     }
