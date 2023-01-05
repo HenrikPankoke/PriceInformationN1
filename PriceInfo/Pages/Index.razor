@@ -18,7 +18,22 @@
         </GridColumns>
     </SfGrid>*@
 
-<SfChart Title="@chartTitle" Width="800px" Height="800px">
+<SfChart Title="@chartTitle" Width="1200px" Height="800px">
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90" >
+    </ChartPrimaryXAxis>
+
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@graphData" PointColorMapping="color"  XName="columnText" YName="Total"  ColumnSpacing="10" ColumnWidth="0.1" Opacity="0.9" DashArray="10"  Type="ChartSeriesType.Column">
+            <ChartMarker >
+                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="-90" Alignment="Alignment.Near" Position="LabelPosition.Top">
+                    
+                </ChartDataLabel>
+            </ChartMarker>
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
+@*<SfChart Title="@chartTitle" Width="800px" Height="800px">
     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
     </ChartPrimaryXAxis>
 
@@ -30,7 +45,8 @@
             </ChartMarker>
         </ChartSeries>
     </ChartSeriesCollection>
-</SfChart>
+</SfChart>*@
+
 @subTitle
 <br />
 Maks: @Math.Round(max, 1) øre
@@ -40,6 +56,7 @@ Gennemsnit: @Math.Round(avg, 1) øre
 
 
 @code{
+
     [Parameter]
     public string priceArea { get; set; }
     public string chartTitle { get; set; }
@@ -51,10 +68,6 @@ Gennemsnit: @Math.Round(avg, 1) øre
     }
     double max = 0.0;
     double avg = 0.0;
-
-
-
-
 
     Prices prices = new Prices();
     List<ActualPrice> graphData;
@@ -96,7 +109,15 @@ Gennemsnit: @Math.Round(avg, 1) øre
 
         foreach (var p in prices.calculatedPrices)
         {
+            StringBuilder sb = new();
+            sb.Append(p.HourDK.Date.ToString("dd/MM"));
+            sb.Append("  ");
 
+            sb.Append(p.HourDK.Hour.ToString());
+            sb.Append("-");
+            sb.Append(p.HourDK.AddHours(1).Hour.ToString());
+
+            p.columnText = sb.ToString();
             p.Total = Math.Round(((p.SpotPriceDKK / 10) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
             p.marking = $"{p.Total} øre";
@@ -122,7 +143,7 @@ Gennemsnit: @Math.Round(avg, 1) øre
         }
 
 
-        graphData = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
+        graphData = prices.calculatedPrices.OrderBy(x => x.HourDK).Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
 
     }
 
