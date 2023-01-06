@@ -18,20 +18,33 @@
         </GridColumns>
     </SfGrid>*@
 
-<SfChart Title="@chartTitle" Width="1200px" Height="800px">
-    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90" >
-    </ChartPrimaryXAxis>
+<SfDashboardLayout>
+    <DashboardLayoutPanels>
+        <DashboardLayoutPanel>
+            <HeaderTemplate></HeaderTemplate>
+            <ContentTemplate>
+                <SfChart Title="@chartTitle" Width="800px" Height="600px">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
+                    </ChartPrimaryXAxis>
 
-    <ChartSeriesCollection>
-        <ChartSeries DataSource="@graphData" PointColorMapping="color"  XName="columnText" YName="Total"  ColumnSpacing="10" ColumnWidth="0.1" Opacity="0.9" DashArray="10"  Type="ChartSeriesType.Column">
-            <ChartMarker >
-                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="-90" Alignment="Alignment.Near" Position="LabelPosition.Top">
-                    
-                </ChartDataLabel>
-            </ChartMarker>
-        </ChartSeries>
-    </ChartSeriesCollection>
-</SfChart>
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@graphData" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Column">
+                            <ChartMarker>
+                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="-90" Alignment="Alignment.Near" Position="LabelPosition.Top">
+                                    <div>@subTitle</div>
+                                </ChartDataLabel>
+                            </ChartMarker>
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                </SfChart>
+            
+            
+            </ContentTemplate>
+        </DashboardLayoutPanel>
+    </DashboardLayoutPanels>
+</SfDashboardLayout>
+
+
 
 @*<SfChart Title="@chartTitle" Width="800px" Height="800px">
     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
@@ -47,12 +60,25 @@
     </ChartSeriesCollection>
 </SfChart>*@
 
-@subTitle
-<br />
+<style>
+    .e-panel-header {
+        background-color: rgba(0, 0, 0, .1);
+        text-align: center;
+    }
+
+    .e-panel-content {
+        text-align: center;
+        margin-top: 10px;
+    }
+</style>
+
+
+@*@subTitle*@
+@*<br />
 Maks: @Math.Round(max, 1) øre
 <br />
 Gennemsnit: @Math.Round(avg, 1) øre
-<br />
+<br />*@
 
 
 @code{
