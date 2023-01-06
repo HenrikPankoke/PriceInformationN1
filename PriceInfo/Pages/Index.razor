@@ -23,7 +23,7 @@
         <DashboardLayoutPanel>
             <HeaderTemplate></HeaderTemplate>
             <ContentTemplate>
-                <SfChart Title="" Width="660px" Height="380px">
+                <SfChart Title="" Width="1100px" Height="380px">
                     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
                     </ChartPrimaryXAxis>
 
@@ -38,14 +38,14 @@
                     </ChartSeriesCollection>
                 </SfChart>
 
-                <SfChart Title="" Width="660px" Height="380px">
+                <SfChart Title="" Width="660px" Height="800px">
                     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
                     </ChartPrimaryXAxis>
 
                     <ChartSeriesCollection>
                         <ChartSeries DataSource="@graphDataBar" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
                             <ChartMarker>
-                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Auto">
+                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
                                     <div>@subTitle</div>
                                 </ChartDataLabel>
                             </ChartMarker>
