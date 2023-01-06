@@ -23,22 +23,37 @@
         <DashboardLayoutPanel>
             <HeaderTemplate></HeaderTemplate>
             <ContentTemplate>
-                <SfChart Title="@chartTitle" Width="800px" Height="600px">
+                <SfChart Title="" Width="660px" Height="380px">
                     <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
                     </ChartPrimaryXAxis>
 
                     <ChartSeriesCollection>
-                        <ChartSeries DataSource="@graphData" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Column">
+                        <ChartSeries DataSource="@graphDataColumn" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Column">
                             <ChartMarker>
                                 <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="-90" Alignment="Alignment.Near" Position="LabelPosition.Top">
+                                    @*<div>@subTitle</div>*@
+                                </ChartDataLabel>
+                            </ChartMarker>
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                </SfChart>
+
+                <SfChart Title="" Width="660px" Height="380px">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
+                    </ChartPrimaryXAxis>
+
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@graphDataBar" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
+                            <ChartMarker>
+                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Auto">
                                     <div>@subTitle</div>
                                 </ChartDataLabel>
                             </ChartMarker>
                         </ChartSeries>
                     </ChartSeriesCollection>
                 </SfChart>
-            
-            
+
+
             </ContentTemplate>
         </DashboardLayoutPanel>
     </DashboardLayoutPanels>
@@ -96,7 +111,8 @@ Gennemsnit: @Math.Round(avg, 1) øre
     double avg = 0.0;
 
     Prices prices = new Prices();
-    List<ActualPrice> graphData;
+    List<ActualPrice> graphDataColumn;
+    List<ActualPrice> graphDataBar;
     protected override async Task OnInitializedAsync()
     {
         chartTitle = $"DK1 - {priceArea} [øre/kWh]";
@@ -169,8 +185,8 @@ Gennemsnit: @Math.Round(avg, 1) øre
         }
 
 
-        graphData = prices.calculatedPrices.OrderBy(x => x.HourDK).Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
-
+        graphDataColumn = prices.calculatedPrices.OrderBy(x => x.HourDK).Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
+        graphDataBar = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
     }
 
 
