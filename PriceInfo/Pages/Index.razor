@@ -5,6 +5,8 @@
 @using System.Text;
 @using PriceInfo.Classes
 @using Syncfusion.Blazor.Charts
+@using Newtonsoft.Json;
+
 @inject HttpClient Http
 @page "/"
 @page "/{priceArea}"
@@ -52,7 +54,21 @@
                         </ChartSeries>
                     </ChartSeriesCollection>
                 </SfChart>
+                @*<br />
+                <SfChart Title="Forventet DK1 - Markedspriser [øre/kwh]" Width="660px" Height="2000px">
+                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
+                    </ChartPrimaryXAxis>
 
+                    <ChartSeriesCollection>
+                        <ChartSeries DataSource="@graphDataForcast" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
+                            <ChartMarker>
+                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
+                                    <div></div>
+                                </ChartDataLabel>
+                            </ChartMarker>
+                        </ChartSeries>
+                    </ChartSeriesCollection>
+                </SfChart>*@
 
             </ContentTemplate>
         </DashboardLayoutPanel>
@@ -61,19 +77,6 @@
 
 
 
-@*<SfChart Title="@chartTitle" Width="800px" Height="800px">
-    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
-    </ChartPrimaryXAxis>
-
-    <ChartSeriesCollection>
-        <ChartSeries DataSource="@graphData" PointColorMapping="color" XName="HourDK" YName="Total" ColumnSpacing="0.5" ColumnWidth="1.0" Opacity="0.5" DashArray="10" Fill="green" Type="ChartSeriesType.Bar">
-            <ChartMarker>
-                <ChartDataLabel Visible="true" Name="marking" />
-
-            </ChartMarker>
-        </ChartSeries>
-    </ChartSeriesCollection>
-</SfChart>*@
 
 <style>
     .e-panel-header {
@@ -103,16 +106,20 @@ Gennemsnit: @Math.Round(avg, 1) øre
     public string chartTitle { get; set; }
     public string subTitle { get; set; }
 
+
     protected override void OnInitialized()
     {
         priceArea = priceArea ?? "N1";
     }
-    double max = 0.0;
-    double avg = 0.0;
+
 
     Prices prices = new Prices();
     List<ActualPrice> graphDataColumn;
     List<ActualPrice> graphDataBar;
+    List<EstimatedPrice> graphDataForcast;
+
+
+
     protected override async Task OnInitializedAsync()
     {
         chartTitle = $"DK1 - {priceArea} [øre/kWh]";
@@ -120,8 +127,66 @@ Gennemsnit: @Math.Round(avg, 1) øre
 
         ListofTarifs(prices);
         await GetSpotPrice(prices);
+        await GetForeCast(prices);
         await MatchSpotWithTarif(prices, priceArea);
-        await PrepareGraphData();
+        PrepareGraphData();
+
+        PrepareGraphDataForCast();
+    }
+
+
+    private void PrepareGraphDataForCast()
+    {
+        double max = 0.0;
+        double avg = 0.0;
+        double sum = 0.0;
+
+        foreach (var p in prices.calculatedForeCastPrices)
+        {
+            StringBuilder sb = new();
+            sb.Append(p.HourDK.Date.ToString("dd/MM"));
+            sb.Append("  ");
+
+            sb.Append(p.HourDK.Hour.ToString());
+            sb.Append("-");
+            sb.Append(p.HourDK.AddHours(1).Hour.ToString());
+
+            p.columnText = sb.ToString();
+            p.Total = Math.Round(((p.SpotPriceDKK / 7.44) + p.Tarif) * 1.25, 1);
+            p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 7.44, 2);
+            p.marking = $"{p.Total} øre";
+            sum = sum + p.Total;
+
+            if (p.Total >= max)
+            {
+                max = p.Total;
+            }
+        }
+        avg = sum / prices.forCast.DK1.Count;
+
+        foreach (var p in prices.calculatedForeCastPrices)
+        {
+            p.color = "orange";
+            if (p.Total <= avg)
+            {
+                p.color = "green";
+            }
+            if (p.Total > max * 0.75)
+            {
+                p.color = "red";
+            }
+        }
+        DateTime foreCastBeginDate = new();
+        foreCastBeginDate = prices.calculatedActualPrices.Max(x => x.HourDK);
+
+        graphDataForcast = prices.calculatedForeCastPrices.OrderByDescending(x => x.HourDK).Where(x => x.HourDK > foreCastBeginDate.AddHours(0)).ToList();
+
+    }
+    private async Task GetForeCast(Prices prices)
+    {
+        prices.forCast = new();
+        var endpoint = new Uri("https://raw.githubusercontent.com/solmoller/Spotprisprognose/main/prognose.json");
+        prices.forCast = await Http.GetFromJsonAsync<Forecast>(endpoint);
 
     }
 
@@ -139,17 +204,20 @@ Gennemsnit: @Math.Round(avg, 1) øre
         sb.Append("&end=");
         sb.Append(tomorrow);
         sb.Append("&filter={%22PriceArea%22:[%22DK1%22]}");
+
         var endpoint = new Uri(sb.ToString());
         prices.spotPrice = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
 
     }
 
-    private async Task PrepareGraphData()
+    private void PrepareGraphData()
     {
+        double max = 0.0;
+        double avg = 0.0;
         double sum = 0.0;
 
 
-        foreach (var p in prices.calculatedPrices)
+        foreach (var p in prices.calculatedActualPrices)
         {
             StringBuilder sb = new();
             sb.Append(p.HourDK.Date.ToString("dd/MM"));
@@ -169,9 +237,9 @@ Gennemsnit: @Math.Round(avg, 1) øre
                 max = p.Total;
             }
         }
-        avg = sum / prices.calculatedPrices.Count;
+        avg = sum / prices.calculatedActualPrices.Count;
 
-        foreach (var p in prices.calculatedPrices)
+        foreach (var p in prices.calculatedActualPrices)
         {
             p.color = "orange";
             if (p.Total <= avg)
@@ -185,19 +253,30 @@ Gennemsnit: @Math.Round(avg, 1) øre
         }
 
 
-        graphDataColumn = prices.calculatedPrices.OrderBy(x => x.HourDK).Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
-        graphDataBar = prices.calculatedPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
+
+
+        graphDataColumn = prices.calculatedActualPrices.OrderBy(x => x.HourDK).Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
+        graphDataBar = prices.calculatedActualPrices.Where(x => x.HourDK > DateTime.Now.AddHours(-1)).ToList();
     }
 
 
     private async Task MatchSpotWithTarif(Prices prices, string priceArea)
     {
-        prices.calculatedPrices = new();
+        //Only works on price area DK1 currently
+
+        prices.calculatedActualPrices = new();
         foreach (var r in prices.spotPrice.records)
         {
             ActualPrice ap = new(r.HourDK, r.SpotPriceDKK, AddTarif(r.HourDK.Hour, prices.tarifs, priceArea));
-            prices.calculatedPrices.Add(ap);
+            prices.calculatedActualPrices.Add(ap);
             //Console.WriteLine(r.HourDK.Hour);
+        }
+
+        prices.calculatedForeCastPrices = new();
+        foreach (var r in prices.forCast.DK1)
+        {
+            EstimatedPrice fp = new(r.Time, r.Price, AddTarif(r.Time.Hour, prices.tarifs, priceArea));
+            prices.calculatedForeCastPrices.Add(fp);
         }
     }
 
@@ -220,12 +299,12 @@ Gennemsnit: @Math.Round(avg, 1) øre
 
         //https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2023
         prices.tarifs.Add(new(0, 17, "N1", 43.22));
-        prices.tarifs.Add(new(17, 21, "N1", 105.62));
-        prices.tarifs.Add(new(21, 24, "N1", 43.22));
+        prices.tarifs.Add(new(17, 20, "N1", 105.62));
+        prices.tarifs.Add(new(20, 24, "N1", 43.22));
 
         prices.tarifs.Add(new(0, 17, "DinEl", 16.36));
-        prices.tarifs.Add(new(17, 21, "DinEl", 45.37));
-        prices.tarifs.Add(new(21, 24, "DinEl", 16.36));
+        prices.tarifs.Add(new(17, 20, "DinEl", 45.37));
+        prices.tarifs.Add(new(20, 24, "DinEl", 16.36));
 
     }
 
