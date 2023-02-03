@@ -32,7 +32,7 @@
                     <ChartSeriesCollection>
                         <ChartSeries DataSource="@graphDataColumn" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Column">
                             <ChartMarker>
-                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="-90" Alignment="Alignment.Near" Position="LabelPosition.Top">
+                                <ChartDataLabel Visible="true" Name="markingKr" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Outer">
                                     @*<div>@subTitle</div>*@
                                 </ChartDataLabel>
                             </ChartMarker>
@@ -47,7 +47,7 @@
                     <ChartSeriesCollection>
                         <ChartSeries DataSource="@graphDataBar" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
                             <ChartMarker>
-                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
+                                <ChartDataLabel Visible="true" Name="markingOre" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
                                     <div>@subTitle</div>
                                 </ChartDataLabel>
                             </ChartMarker>
@@ -155,6 +155,7 @@ Gennemsnit: @Math.Round(avg, 1) øre
             p.Total = Math.Round(((p.SpotPriceDKK / 7.44) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 7.44, 2);
             p.marking = $"{p.Total} øre";
+
             sum = sum + p.Total;
 
             if (p.Total >= max)
@@ -230,7 +231,8 @@ Gennemsnit: @Math.Round(avg, 1) øre
             p.columnText = sb.ToString();
             p.Total = Math.Round(((p.SpotPriceDKK / 10) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
-            p.marking = $"{p.Total} øre";
+            p.markingOre = $"{p.Total} øre";
+            p.markingKr = $"{Math.Round(p.Total/100,2)}";
             sum = sum + p.Total;
             if (p.Total >= max)
             {
@@ -301,7 +303,7 @@ Gennemsnit: @Math.Round(avg, 1) øre
         prices.tarifs.Add(new(0, 17, "N1", 43.22));
         prices.tarifs.Add(new(17, 20, "N1", 105.62));
         prices.tarifs.Add(new(20, 24, "N1", 43.22));
-
+        //https://dinel.dk/priser-og-bestemmelser/
         prices.tarifs.Add(new(0, 17, "DinEl", 16.36));
         prices.tarifs.Add(new(17, 20, "DinEl", 45.37));
         prices.tarifs.Add(new(20, 24, "DinEl", 16.36));
