@@ -299,15 +299,24 @@ Gennemsnit: @Math.Round(avg, 1) øre
     {
         prices.tarifs = new List<TarifWindow>();
 
+        ////https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2023
+        //prices.tarifs.Add(new(0, 17, "N1", 43.22));
+        //prices.tarifs.Add(new(17, 20, "N1", 105.62));
+        //prices.tarifs.Add(new(20, 24, "N1", 43.22));
+        ////https://dinel.dk/priser-og-bestemmelser/
+        //prices.tarifs.Add(new(0, 17, "DinEl", 16.36));
+        //prices.tarifs.Add(new(17, 20, "DinEl", 45.37));
+        //prices.tarifs.Add(new(20, 24, "DinEl", 16.36));
+
         //https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2023
         prices.tarifs.Add(new(0, 17, "N1", 43.22));
-        prices.tarifs.Add(new(17, 20, "N1", 105.62));
+        prices.tarifs.Add(new(17, 20, "N1", 43.22));
         prices.tarifs.Add(new(20, 24, "N1", 43.22));
         //https://dinel.dk/priser-og-bestemmelser/
-        prices.tarifs.Add(new(0, 17, "DinEl", 16.36));
-        prices.tarifs.Add(new(17, 20, "DinEl", 45.37));
-        prices.tarifs.Add(new(20, 24, "DinEl", 16.36));
-
+        prices.tarifs.Add(new(0, 6, "DinEl", 12.24));
+        prices.tarifs.Add(new(6, 17, "DinEl", 18.37));
+        prices.tarifs.Add(new(17, 21, "DinEl", 47.75));
+        prices.tarifs.Add(new(21, 24, "DinEl", 18.37));
     }
 
 }
