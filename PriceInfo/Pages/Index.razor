@@ -55,20 +55,20 @@
                     </ChartSeriesCollection>
                 </SfChart>
                 @*<br />
-                <SfChart Title="Forventet DK1 - Markedspriser [øre/kwh]" Width="660px" Height="2000px">
-                    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
-                    </ChartPrimaryXAxis>
+                    <SfChart Title="Forventet DK1 - Markedspriser [øre/kwh]" Width="660px" Height="2000px">
+                        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
+                        </ChartPrimaryXAxis>
 
-                    <ChartSeriesCollection>
-                        <ChartSeries DataSource="@graphDataForcast" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
-                            <ChartMarker>
-                                <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
-                                    <div></div>
-                                </ChartDataLabel>
-                            </ChartMarker>
-                        </ChartSeries>
-                    </ChartSeriesCollection>
-                </SfChart>*@
+                        <ChartSeriesCollection>
+                            <ChartSeries DataSource="@graphDataForcast" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
+                                <ChartMarker>
+                                    <ChartDataLabel Visible="true" Name="marking" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
+                                        <div></div>
+                                    </ChartDataLabel>
+                                </ChartMarker>
+                            </ChartSeries>
+                        </ChartSeriesCollection>
+                    </SfChart>*@
 
             </ContentTemplate>
         </DashboardLayoutPanel>
@@ -93,10 +93,10 @@
 
 @*@subTitle*@
 @*<br />
-Maks: @Math.Round(max, 1) øre
-<br />
-Gennemsnit: @Math.Round(avg, 1) øre
-<br />*@
+    Maks: @Math.Round(max, 1) øre
+    <br />
+    Gennemsnit: @Math.Round(avg, 1) øre
+    <br />*@
 
 
 @code{
@@ -232,7 +232,7 @@ Gennemsnit: @Math.Round(avg, 1) øre
             p.Total = Math.Round(((p.SpotPriceDKK / 10) + p.Tarif) * 1.25, 1);
             p.SpotPriceDKK = Math.Round(p.SpotPriceDKK / 10, 2);
             p.markingOre = $"{p.Total} øre";
-            p.markingKr = $"{Math.Round(p.Total/100,2)}";
+            p.markingKr = $"{Math.Round(p.Total / 100, 2)}";
             sum = sum + p.Total;
             if (p.Total >= max)
             {
@@ -309,17 +309,16 @@ Gennemsnit: @Math.Round(avg, 1) øre
         //prices.tarifs.Add(new(20, 24, "DinEl", 16.36));
 
         //https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2023
-        prices.tarifs.Add(new(0, 17, "N1", 0.0));
-        prices.tarifs.Add(new(17, 20, "N1", 0.0));
-        prices.tarifs.Add(new(20, 24, "N1", 0.0));
+        prices.tarifs.Add(new(0, 17, "N1", 0.00 + 69.7));
+        prices.tarifs.Add(new(17, 20, "N1", 0.00 + 69.7));
+        prices.tarifs.Add(new(20, 24, "N1", 0.00 + 69.7));
         //https://dinel.dk/priser-og-bestemmelser/
-        prices.tarifs.Add(new(0, 6, "DinEl", 12.24));
-        prices.tarifs.Add(new(6, 17, "DinEl", 18.37));
-        prices.tarifs.Add(new(17, 21, "DinEl", 47.75));
-        prices.tarifs.Add(new(21, 24, "DinEl", 18.37));
+        prices.tarifs.Add(new(0, 6, "DinEl", 12.24 + 69.7));
+        prices.tarifs.Add(new(6, 17, "DinEl", 18.37 + 69.7));
+        prices.tarifs.Add(new(17, 21, "DinEl", 47.75 + 69.7));
+        prices.tarifs.Add(new(21, 24, "DinEl", 18.37 + 69.7));
     }
 
 }
-
 
 
