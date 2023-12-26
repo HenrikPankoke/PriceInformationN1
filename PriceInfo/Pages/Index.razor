@@ -299,24 +299,20 @@
     {
         prices.tarifs = new List<TarifWindow>();
 
-        ////https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2023
-        //prices.tarifs.Add(new(0, 17, "N1", 43.22));
-        //prices.tarifs.Add(new(17, 20, "N1", 105.62));
-        //prices.tarifs.Add(new(20, 24, "N1", 43.22));
-        ////https://dinel.dk/priser-og-bestemmelser/
-        //prices.tarifs.Add(new(0, 17, "DinEl", 16.36));
-        //prices.tarifs.Add(new(17, 20, "DinEl", 45.37));
-        //prices.tarifs.Add(new(20, 24, "DinEl", 16.36));
 
-        //removed tariff for N1 rest of 2023
-        prices.tarifs.Add(new(0, 17, "N1", 0.00 + 69.7));
-        prices.tarifs.Add(new(17, 20, "N1", 0.00 + 69.7));
-        prices.tarifs.Add(new(20, 24, "N1", 0.00 + 69.7));
+        //Prices with VAT
+        
+        //https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2024
+        prices.tarifs.Add(new(0, 6, "N1", 13.76 + 69.7));
+        prices.tarifs.Add(new(6, 17, "N1", 41.29 + 69.7));
+        prices.tarifs.Add(new(17, 21, "N1", 123.88 + 69.7));
+        prices.tarifs.Add(new(21, 24, "N1", 41.29 + 69.7));
+        
         //https://dinel.dk/priser-og-bestemmelser/
-        prices.tarifs.Add(new(0, 6, "DinEl", 12.24 + 69.7));
-        prices.tarifs.Add(new(6, 17, "DinEl", 36.73 + 69.7));
-        prices.tarifs.Add(new(17, 21, "DinEl", 110.20 + 69.7));
-        prices.tarifs.Add(new(21, 24, "DinEl", 36.73 + 69.7));
+        prices.tarifs.Add(new(0, 6, "DinEl", 11.03 + 69.7));
+        prices.tarifs.Add(new(6, 17, "DinEl", 33.06 + 69.7));
+        prices.tarifs.Add(new(17, 21, "DinEl", 99.20 + 69.7));
+        prices.tarifs.Add(new(21, 24, "DinEl", 33.06 + 69.7));
     }
 
 }
