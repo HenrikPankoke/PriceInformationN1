@@ -14,22 +14,29 @@
 @page "/{priceArea}"
 
 <div class="control-section" align='center'>
-    <SfChart Title="@xTitle" Width="1100px" Height="380px">
+    <SfChart Title="@xTitle">
+        @*<SfChart Title="@xTitle" Width="1100px" Height="380px">*@
+
         <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
         @*<ChartEvents OnAxisLabelRender="axisLabel"></ChartEvents>*@
         <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Interval="1" LabelRotation="270">
-            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+            <ChartAxisMajorGridLines Width="1"></ChartAxisMajorGridLines>
             <ChartAxisMinorGridLines Width="0"></ChartAxisMinorGridLines>
             <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
             <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
             <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
         </ChartPrimaryXAxis>
         <ChartPrimaryYAxis Title="@yTitle">
+
             <ChartAxisMinorGridLines Width="1"></ChartAxisMinorGridLines>
             <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
             <ChartAxisMinorTickLines Width="0"></ChartAxisMinorTickLines>
             <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
         </ChartPrimaryYAxis>
+
+        @*<ChartTooltipSettings Enable="true" Header="Sales" Format="<b>${series.name} : ${point.y}</b>"></ChartTooltipSettings>*@
+        <ChartLegendSettings Visible="true" EnableHighlight="false" Position="LegendPosition.Top" />
+
         <ChartSeriesCollection>
             <ChartSeries ColumnWidth="0.5" DataSource="@graphDataColumn" XName="columnText" YName="SpotPriceDKK_kWh" Width="2" Name="kWh pris" Type="ChartSeriesType.StackingColumn">
                 <ChartSeriesBorder Width="1" Color="#ffffff"></ChartSeriesBorder>
@@ -37,15 +44,29 @@
             <ChartSeries ColumnWidth="0.5" DataSource="@graphDataColumn" XName="columnText" YName="Tarif" Width="2" Name="Tarif" Type="ChartSeriesType.StackingColumn">
                 <ChartSeriesBorder Width="1" Color="#ffffff"></ChartSeriesBorder>
             </ChartSeries>
-            <ChartSeries ColumnWidth="0.5" DataSource="@graphDataColumn" XName="columnText" YName="Duty" Width="2" Name="Afgift" Type="ChartSeriesType.StackingColumn">
+            <ChartSeries ColumnWidth="0.5" DataSource="@graphDataColumn" XName="columnText" YName="Duty" Width="2" Name="El-Afgift" Type="ChartSeriesType.StackingColumn">
                 <ChartSeriesBorder Width="1" Color="#ffffff"></ChartSeriesBorder>
             </ChartSeries>
             <ChartSeries ColumnWidth="0.5" DataSource="@graphDataColumn" XName="columnText" YName="VAT" Width="2" Name="Moms" Type="ChartSeriesType.StackingColumn">
                 <ChartSeriesBorder Width="1" Color="#ffffff"></ChartSeriesBorder>
             </ChartSeries>
         </ChartSeriesCollection>
-        <ChartTooltipSettings Enable="false"></ChartTooltipSettings>
-        <ChartLegendSettings Visible="true" EnableHighlight="false"></ChartLegendSettings>
+
+    </SfChart>
+
+    <SfChart Title="" Width="660px" Height="800px">
+        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" LabelRotation="-90">
+        </ChartPrimaryXAxis>
+
+        <ChartSeriesCollection>
+            <ChartSeries DataSource="@graphDataBar" PointColorMapping="color" XName="columnText" YName="Total" Opacity="0.9" DashArray="5" Type="ChartSeriesType.Bar">
+                <ChartMarker>
+                    <ChartDataLabel Visible="true" Name="markingOre" EnableRotation="true" Angle="0" Alignment="Alignment.Near" Position="LabelPosition.Bottom">
+                        <div>@yTitle</div>
+                    </ChartDataLabel>
+                </ChartMarker>
+            </ChartSeries>
+        </ChartSeriesCollection>
     </SfChart>
 </div>
 
@@ -66,7 +87,7 @@
 
     [Parameter]
     public string priceArea { get; set; }
-    
+
 
 
     protected override void OnInitialized()
@@ -193,9 +214,9 @@
             sb.Append(p.HourDK.AddHours(1).Hour.ToString());
 
             p.columnText = sb.ToString();
-            double calc_sum = ((p.SpotPriceDKK_kWh / 10) + p.Tarif + p.Duty);
+            double calc_sum = ((p.SpotPriceDKK_kWh) + p.Tarif + p.Duty);
             p.VAT = Math.Round(calc_sum * 0.25, 2);
-            p.Total = Math.Round(calc_sum * 1.25, 2);
+            p.Total = Math.Round(calc_sum * 1.25, 1);
             p.Duty = Math.Round(p.Duty, 2);
             p.SpotPriceDKK_kWh = Math.Round(p.SpotPriceDKK_kWh, 2);
             p.markingOre = $"{p.Total} øre";
@@ -234,7 +255,8 @@
         {
             //Without VAT
             //https://skm.dk/tal-og-metode/satser/satser-og-beloebsgraenser-i-lovgivningen/elafgiftsloven
-            p.Duty = 66.7;
+            p.Duty = 69.7; //2023
+            //p.Duty = 76.1; //2024
         }
 
     }
@@ -280,16 +302,29 @@
         //Prices without VAT
 
         //https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2024
-        prices.tarifs.Add(new(0, 6, "N1", 11.01));
-        prices.tarifs.Add(new(6, 17, "N1", 33.03));
-        prices.tarifs.Add(new(17, 21, "N1", 99.01));
-        prices.tarifs.Add(new(21, 24, "N1", 33.03));
+        prices.tarifs.Add(new(0, 6, "N1", 0.0));
+        prices.tarifs.Add(new(6, 17, "N1", 0.0));
+        prices.tarifs.Add(new(17, 21, "N1", 0.0));
+        prices.tarifs.Add(new(21, 24, "N1", 0.0));
 
         //https://dinel.dk/priser-og-bestemmelser/
-        prices.tarifs.Add(new(0, 6, "DinEl", 8.82));
-        prices.tarifs.Add(new(6, 17, "DinEl", 26.45));
-        prices.tarifs.Add(new(17, 21, "DinEl", 79.36));
-        prices.tarifs.Add(new(21, 24, "DinEl", 26.45));
+        prices.tarifs.Add(new(0, 6, "DinEl", 12.24));
+        prices.tarifs.Add(new(6, 17, "DinEl", 36.73));
+        prices.tarifs.Add(new(17, 21, "DinEl", 110.2));
+        prices.tarifs.Add(new(21, 24, "DinEl", 36.73));
+
+
+        ////https://n1.dk/priser-og-vilkaar/kommende-priser-1-1-2024
+        //prices.tarifs.Add(new(0, 6, "N1", 11.01));
+        //prices.tarifs.Add(new(6, 17, "N1", 33.03));
+        //prices.tarifs.Add(new(17, 21, "N1", 99.01));
+        //prices.tarifs.Add(new(21, 24, "N1", 33.03));
+
+        ////https://dinel.dk/priser-og-bestemmelser/
+        //prices.tarifs.Add(new(0, 6, "DinEl", 8.82));
+        //prices.tarifs.Add(new(6, 17, "DinEl", 26.45));
+        //prices.tarifs.Add(new(17, 21, "DinEl", 79.36));
+        //prices.tarifs.Add(new(21, 24, "DinEl", 26.45));
     }
 
 }
