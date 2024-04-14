@@ -5,8 +5,8 @@
         public int total { get; set; }
         public string filters { get; set; }
         public string dataset { get; set; }
-        public List<Record> records { get; set; }
+        public List<ElPrisSpot> records { get; set; }
     }
 
-    
+
 }
