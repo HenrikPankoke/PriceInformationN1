@@ -267,12 +267,11 @@
             sb.Append(p.HourDK.AddHours(1).Hour.ToString());
 
             p.columnText = sb.ToString();
-            p.SpotPriceDKK_kWh = p.SpotPriceDKK_kWh * 100; //converting to øre to match other prices
-            double calc_sum = p.SpotPriceDKK_kWh + p.Tarif + p.Duty;
+            double calc_sum = ((p.SpotPriceDKK_kWh) + p.Tarif + p.Duty);
             p.VAT = Math.Round(calc_sum * 0.25, 2);
             p.Total = Math.Round(calc_sum * 1.25, 1);
             p.Duty = Math.Round(p.Duty, 2);
-            p.SpotPriceDKK_kWh = Math.Round(p.SpotPriceDKK_kWh, 2);
+            p.SpotPriceDKK_kWh = Math.Round(p.SpotPriceDKK_kWh*100, 2);
             p.markingOre = $"{p.Total} øre";
             p.markingKr = $"{Math.Round(p.Total / 100, 2)}";
             sum = sum + p.Total;
