@@ -183,7 +183,7 @@
         prices.spotPrice = new();
 
         string today = DateTime.Today.ToString("MM-dd");
-
+        string tomorrow = DateTime.Today.AddDays(1).ToString("MM-dd");
         string url = $"https://www.elprisenligenu.dk/api/v1/prices/2024/{today}_DK1.json";
         //prices.spotPrice = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
 
@@ -192,6 +192,18 @@
         {
             string json = await client.GetStringAsync(url);
             prices.spotPrice.records = JsonConvert.DeserializeObject<List<ElPrisSpot>>(json);
+
+            if (DateTime.Now.Hour>=13) //only grab data for tomorrow, after it has been released
+            {
+                url = $"https://www.elprisenligenu.dk/api/v1/prices/2024/{tomorrow}_DK1.json";
+                json = await client.GetStringAsync(url);
+                List<ElPrisSpot> records = JsonConvert.DeserializeObject<List<ElPrisSpot>>(json);
+                foreach (var r in records)
+                {
+                    prices.spotPrice.records.Add(r);
+                }
+            }
+
         }
 
 
@@ -289,7 +301,7 @@
             {
                 p.color = "green";
             }
-            if (p.Total > max * 0.75)
+            if (p.Total > max * 0.85)
             {
                 p.color = "red";
             }
