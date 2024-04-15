@@ -279,7 +279,7 @@
             sb.Append(p.HourDK.AddHours(1).Hour.ToString());
 
             p.columnText = sb.ToString();
-            double calc_sum = ((p.SpotPriceDKK_kWh) + p.Tarif + p.Duty);
+            double calc_sum = ((p.SpotPriceDKK_kWh*100) + p.Tarif + p.Duty);
             p.VAT = Math.Round(calc_sum * 0.25, 2);
             p.Total = Math.Round(calc_sum * 1.25, 1);
             p.Duty = Math.Round(p.Duty, 2);
