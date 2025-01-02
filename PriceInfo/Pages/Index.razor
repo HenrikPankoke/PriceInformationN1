@@ -184,7 +184,7 @@
 
         string today = DateTime.Today.ToString("MM-dd");
         string tomorrow = DateTime.Today.AddDays(1).ToString("MM-dd");
-        string url = $"https://www.elprisenligenu.dk/api/v1/prices/2024/{today}_DK1.json";
+        string url = $"https://www.elprisenligenu.dk/api/v1/prices/2025/{today}_DK1.json";
         //prices.spotPrice = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
 
         List<ElPrisSpot> ElPrisSpot_Records = new();
@@ -195,7 +195,7 @@
 
             if (DateTime.Now.Hour>=13) //only grab data for tomorrow, after it has been released
             {
-                url = $"https://www.elprisenligenu.dk/api/v1/prices/2024/{tomorrow}_DK1.json";
+                url = $"https://www.elprisenligenu.dk/api/v1/prices/2025/{tomorrow}_DK1.json";
                 json = await client.GetStringAsync(url);
                 List<ElPrisSpot> records = JsonConvert.DeserializeObject<List<ElPrisSpot>>(json);
                 foreach (var r in records)
@@ -257,7 +257,8 @@
             //Without VAT
             //https://skm.dk/tal-og-metode/satser/satser-og-beloebsgraenser-i-lovgivningen/elafgiftsloven
             //p.Duty = 69.7; //2023
-            p.Duty = 76.1; //2024
+            //p.Duty = 76.1; //2024
+            p.Duty = 72.0; //2025
         }
 
     }
@@ -370,10 +371,10 @@
         //prices.tarifs.Add(new(17, 21, "N1", 99.10));
         //prices.tarifs.Add(new(21, 24, "N1", 33.03));
 
-        prices.tarifs.Add(new(0, 6, "N1", 4.80));
-        prices.tarifs.Add(new(6, 17, "N1", 13.60));
-        prices.tarifs.Add(new(17, 21, "N1", 40.00));
-        prices.tarifs.Add(new(21, 24, "N1", 13.60));
+        prices.tarifs.Add(new(0, 6, "N1", 8.67));
+        prices.tarifs.Add(new(6, 17, "N1", 26.00));
+        prices.tarifs.Add(new(17, 21, "N1", 78.01));
+        prices.tarifs.Add(new(21, 24, "N1", 26.00));
 
         prices.tarifs.Add(new(0, 6, "DinEl", 8.82));
         prices.tarifs.Add(new(6, 17, "DinEl", 26.45));
