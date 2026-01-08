@@ -94,8 +94,8 @@
     {
         priceArea = priceArea ?? "N1";
 
-    }
 
+    }
 
     Prices prices = new Prices();
     List<ActualPrice> graphDataColumn;
@@ -181,10 +181,10 @@
     private async Task GetSpotPrice(Prices prices)
     {
         prices.spotPrice = new();
-
+        string year = DateTime.Now.Year.ToString();
         string today = DateTime.Today.ToString("MM-dd");
         string tomorrow = DateTime.Today.AddDays(1).ToString("MM-dd");
-        string url = $"https://www.elprisenligenu.dk/api/v1/prices/2025/{today}_DK1.json";
+        string url = $"https://www.elprisenligenu.dk/api/v1/prices/{year}/{today}_DK1.json";
         //prices.spotPrice = await Http.GetFromJsonAsync<SpotPrice>(endpoint);
 
         List<ElPrisSpot> ElPrisSpot_Records = new();
@@ -195,7 +195,7 @@
 
             if (DateTime.Now.Hour>=13) //only grab data for tomorrow, after it has been released
             {
-                url = $"https://www.elprisenligenu.dk/api/v1/prices/2025/{tomorrow}_DK1.json";
+                url = $"https://www.elprisenligenu.dk/api/v1/prices/{year}/{tomorrow}_DK1.json";
                 json = await client.GetStringAsync(url);
                 List<ElPrisSpot> records = JsonConvert.DeserializeObject<List<ElPrisSpot>>(json);
                 foreach (var r in records)
@@ -258,7 +258,9 @@
             //https://skm.dk/tal-og-metode/satser/satser-og-beloebsgraenser-i-lovgivningen/elafgiftsloven
             //p.Duty = 69.7; //2023
             //p.Duty = 76.1; //2024
-            p.Duty = 72.0; //2025
+            //p.Duty = 72.0; //2025
+            p.Duty = 0.8; //2026
+
         }
 
     }
